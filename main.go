@@ -23,13 +23,21 @@ func StartAll(cmdList []*exec.Cmd) ([]*exec.Cmd, error) {
 	return cmdList, nil
 }
 
-// Theoretically, this function write the line
-// func write(numero int) {
-// 	fmt.Println(numero)
-// 	os.WriteFile("output.txt",[]byte(fmt.Sprintf("%d",numero)), os.ModeAppend)
-// }
+// This handle the removal of lock files
+func borrarLock() {
+	for i := 0; i <= 10; i++ {
+		err := os.Remove(".lock" + fmt.Sprintf("%d", i))
+		if err != nil {
+			log.Fatal("Something went wrong:", err)
+		}
+	}
+}
+
+
 // Any code you want.
 func main() {
+	// This handle output.txt is empty at start
+	os.Remove("output.txt")
 	// Any code you want.
 	cmdList := []*exec.Cmd {}
 	for i := 0 ; i <10 ; i ++ {
@@ -45,6 +53,9 @@ func main() {
 		log.Fatal("Something went wrong:", err)
 	}
 	// Any code you want.
+
+	// Create first lock 0
+	os.WriteFile(".lock0", []byte(""), 0644)
 	// Wait for all commands to finish
 	for _, cmd := range cmdList {
 		err := cmd.Wait()
@@ -53,6 +64,7 @@ func main() {
 			log.Fatal("Something went wrong:", err)
 		}
 	}
+	borrarLock()
 
 
 }
